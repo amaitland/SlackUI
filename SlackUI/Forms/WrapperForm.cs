@@ -38,9 +38,7 @@ namespace SlackUI {
             // Initializes a new instance of the chromium web browser
             chromium = new ChromiumWebBrowser(AboutBlankPage) {
                 Dock = DockStyle.Fill,
-                MenuHandler = new BrowserMenuHandler(),
-                LifeSpanHandler = new BrowserLifeSpanHandler(),
-                RequestHandler = new BrowserRequestHandler()
+                MenuHandler = new BrowserMenuHandler()
             };
 
             // Subscribe to multiple chromium web browser events
@@ -81,7 +79,7 @@ namespace SlackUI {
             // Is the browser ready to load a page as the first page load?
             if(!e.CanGoBack && !e.CanGoForward && e.CanReload) {
                 // Load the active team domain address
-                chromium.Load(Program.ActiveTeamAddress);
+                chromium.Load("http://jsfiddle.net/u7sffzc5/");
 
                 // Unsubscribe the navigation state changed event
                 chromium.NavStateChanged -= chromium_NavStateChanged;
