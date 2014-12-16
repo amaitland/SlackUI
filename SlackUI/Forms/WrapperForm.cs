@@ -22,7 +22,6 @@ namespace SlackUI {
         private readonly ChromiumWebBrowser chromium;
 
         private FormWindowState previousWindowState;
-        private bool firstLoad = true;
 
         #endregion
 
@@ -37,7 +36,6 @@ namespace SlackUI {
             // Initializes a new instance of the chromium web browser
             chromium = new ChromiumWebBrowser("http://jsfiddle.net/u7sffzc5/")
             {
-                Dock = DockStyle.Fill,
                 MenuHandler = new BrowserMenuHandler()
             };
 
@@ -60,10 +58,12 @@ namespace SlackUI {
          */
         private void chromium_FrameLoadEnd(object sender, CefSharp.FrameLoadEndEventArgs e)
         {
-            if (firstLoad)
+            if (e.IsMainFrame)
             {
                 // Remove the initial load overlay from the form
                 this.InvokeOnUiThreadIfRequired(() => browserPanel.Controls.RemoveByKey("initialLoadOverlay"));
+
+                chromium.FrameLoadEnd -= chromium_FrameLoadEnd;
             }
         }
 
