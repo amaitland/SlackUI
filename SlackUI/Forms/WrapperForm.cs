@@ -17,13 +17,12 @@ namespace SlackUI {
 
         #region Private Fields
 
-        private const string AboutBlankPage = "about:blank";
-
         private const uint SYSMENU_DEVTOOLS_ID = 0x1;
 
         private readonly ChromiumWebBrowser chromium;
 
         private FormWindowState previousWindowState;
+        private bool firstLoad = true;
 
         #endregion
 
@@ -36,14 +35,14 @@ namespace SlackUI {
             InitializeComponent();
 
             // Initializes a new instance of the chromium web browser
-            chromium = new ChromiumWebBrowser(AboutBlankPage) {
+            chromium = new ChromiumWebBrowser("http://jsfiddle.net/u7sffzc5/")
+            {
                 Dock = DockStyle.Fill,
                 MenuHandler = new BrowserMenuHandler()
             };
 
             // Subscribe to multiple chromium web browser events
             chromium.FrameLoadEnd += chromium_FrameLoadEnd;
-            chromium.NavStateChanged += chromium_NavStateChanged;
 
             // Add the chromium web browser to the browser panel
             browserPanel.Controls.Add(chromium);
@@ -59,30 +58,12 @@ namespace SlackUI {
         /*
          * Chromium web browser frame load end event handler.
          */
-        private void chromium_FrameLoadEnd(object sender, CefSharp.FrameLoadEndEventArgs e) {
-            // Was the loaded page the first page load?
-            if(!e.Url.Contains(AboutBlankPage)) {
+        private void chromium_FrameLoadEnd(object sender, CefSharp.FrameLoadEndEventArgs e)
+        {
+            if (firstLoad)
+            {
                 // Remove the initial load overlay from the form
-                this.InvokeOnUiThreadIfRequired(() => {
-                    browserPanel.Controls.RemoveByKey("initialLoadOverlay");
-                });
-
-                // Unsubscribe the frame load end event
-                chromium.FrameLoadEnd -= chromium_FrameLoadEnd;
-            }
-        }
-
-        /*
-         * Chromium web browser navigation state changed event handler.
-         */
-        private void chromium_NavStateChanged(object sender, CefSharp.NavStateChangedEventArgs e) {
-            // Is the browser ready to load a page as the first page load?
-            if(!e.CanGoBack && !e.CanGoForward && e.CanReload) {
-                // Load the active team domain address
-                chromium.Load("http://jsfiddle.net/u7sffzc5/");
-
-                // Unsubscribe the navigation state changed event
-                chromium.NavStateChanged -= chromium_NavStateChanged;
+                this.InvokeOnUiThreadIfRequired(() => browserPanel.Controls.RemoveByKey("initialLoadOverlay"));
             }
         }
 
